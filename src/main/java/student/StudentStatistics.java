@@ -3,10 +3,12 @@ package student;
 import student.domain.Gender;
 import student.domain.Student;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StudentStatistics {
@@ -19,13 +21,10 @@ public class StudentStatistics {
      * @throws IOException
      */
     public StudentStatistics(Path path) throws IOException {
-        try(Stream<String> lines = Files.lines(path)
-                                        .skip(1)){
-           students=new TreeSet<>();
-            lines.forEach(s -> {
-                students.add(Student.of(s));
-            });
-        }
+        students= Files.lines(path)
+                .skip(1)
+                .map(s -> Student.of(s))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -34,17 +33,19 @@ public class StudentStatistics {
      * @return number of students of the given gender
      */
     public long countGender(Gender gender) {
-        Stream.of(students)
-                .forEach(students1 -> );
-        return 0;
+        return students.stream()
+                .filter(student -> student.gender().equals(gender))
+                .count();
     }
-
     /**
      * Returns all students classes sorted alphabetically.
      * @return all students classes sorted alphabetically
      */
     public SortedSet<String> getClasses() {
-        return null;
+        return students.stream()
+                .map(student -> student.schoolClass())
+                .sorted()
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     /**
@@ -53,6 +54,7 @@ public class StudentStatistics {
      * @return count of students of each gender
      */
     public Map<Gender, Long> getGenderCountForClass(String schoolClass) {
+
         return null;
     }
 
