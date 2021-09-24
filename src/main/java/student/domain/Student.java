@@ -4,7 +4,7 @@ public record Student(String schoolClass,
                       int number,
                       String firstName,
                       String secondName,
-                      Gender gender) implements Comparable{
+                      Gender gender) {
 
     public static Student of(String csv) {
         var splitted = csv.split(",");
@@ -21,6 +21,7 @@ public record Student(String schoolClass,
             case "D":
                 gender = Gender.DIVERSE;
                 break;
+
             default:
                 throw new IllegalArgumentException();
         }
@@ -38,8 +39,5 @@ public record Student(String schoolClass,
         return String.format("%s/%02d %s %s %s", schoolClass, number, secondName, firstName, gender);
     }
 
-    @Override
-    public int compareTo(Object o) {
-        return 0;
-    }
+
 }
