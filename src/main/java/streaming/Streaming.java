@@ -1,11 +1,8 @@
 package streaming;
 
 import java.math.BigInteger;
-import java.util.OptionalLong;
-import java.util.Random;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.stream.*;
 
 public class Streaming {
 
@@ -67,5 +64,17 @@ public class Streaming {
         return supplier.getI();
     }
 
+
+    public static void main(String[] args) {
+        System.out.println(Stream.of("1","1d","233")
+                .mapToInt(s -> s.length())
+                .average()
+                .orElseThrow()
+        );
+        var hallo=new Random().ints(20,1,100)
+                .boxed()
+                .collect(Collectors.groupingBy(i -> i/10,TreeMap::new,Collectors.toList()));
+        System.out.println(hallo);
+    }
 
 }
