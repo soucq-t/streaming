@@ -24,7 +24,7 @@ public class StudentStatistics {
     public StudentStatistics(Path path) throws IOException {
         students = Files.lines(path)
                 .skip(1)
-                .map(s -> Student.of(s))
+                .map(Student::of)
                 .collect(Collectors.toSet());
     }
 
@@ -47,7 +47,7 @@ public class StudentStatistics {
      */
     public SortedSet<String> getClasses() {
         return students.stream()
-                .map(student -> student.schoolClass())
+                .map(Student::schoolClass)
                 .sorted()
                 .collect(Collectors.toCollection(TreeSet::new));
     }
@@ -88,7 +88,8 @@ public class StudentStatistics {
      */
     public Optional<Student> findByNumberAndClass(int number, String schoolClass) {
         return students.stream()
-                .filter(student -> student.number() == number && student.schoolClass() == schoolClass)
+                .filter(student -> student.number() == number && student.schoolClass().equals(schoolClass))
+                .peek(student -> System.out.println(student.schoolClass() + " " + student.firstName() + student.secondName()))
                 .findAny();
     }
 
@@ -99,7 +100,7 @@ public class StudentStatistics {
      */
     public Student getStudentWithLongestName() {
         return students.stream()
-                .reduce((student, student2) -> student.firstName().length() + student.secondName().length() > student2.firstName().length() + student2.secondName().length()? student:student2 )
+                .reduce((student, student2) -> student.firstName().length() + student.secondName().length() > student2.firstName().length() + student2.secondName().length() ? student : student2)
                 .get();
     }
 
@@ -110,12 +111,20 @@ public class StudentStatistics {
      * @return the topX most frequent first names
      */
     public Set<String> getMostFrequentFirstNames(int count) {
-        Map<String,Long> stream=students.stream()
+        if (count<=0){
+            throw new IllegalArgumentException();
+        }
+       return students.stream()
                 .collect(Collectors.groupingBy(Student::firstName,
                         TreeMap::new,
-                        Collectors.counting()));
-        Set<String> set=new TreeSet<>();
-        return null;
+                        Collectors.counting()))
+               .entrySet()
+               .stream()
+               .sorted((o1, o2) -> (int) (o2.getValue()-o1.getValue()))
+               .limit(count)
+               .peek(System.out::println)
+               .map(Map.Entry::getKey)
+               .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -124,6 +133,9 @@ public class StudentStatistics {
      * @return count of students of each year
      */
     public Map<Integer, Long> countStudentsByYear() {
-        return null;
+        return students.stream()
+                .collect(Collectors.groupingBy(o -> Integer.parseInt(o.schoolClass().substring(0,1)),
+                        TreeMap::new,
+                        Collectors.counting()));
     }
 }
